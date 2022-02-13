@@ -20,6 +20,7 @@ class Auth {
   async login(email, password) {
     const user = await this.users.getByEmail(email);
     const correctPassword = await bcrypt.compare(password, user.password);
+    console.log(correctPassword);
     if (user && correctPassword) {
       // user.password = undefined
       // user.__v = undefined

@@ -15,6 +15,7 @@ function users(app) {
 
   router.get('/', isAdmin, async (req, res) => {
     console.log(req.user);
+    //pude obtener y mostrar la cookie obtendida en la peticion con la libreria cookie parser
     console.log(req.cookies);
     const users = await usersService.getAll();
     return res.status(200).json(users);

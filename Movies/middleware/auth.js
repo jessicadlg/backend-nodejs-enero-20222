@@ -4,6 +4,7 @@ const { jwt_secret } = require('../config');
 const handleToken = (token, req, res, next) => {
   try {
     const decoded = jwt.verify(token, jwt_secret);
+    //añado el token verificado al usuario
     req.user = decoded;
     return validateRole(req, res, next);
   } catch (error) {
@@ -29,7 +30,7 @@ const validateRole = (req, res, next) => {
 const verifyToken = (req, res, next) => {
   const auth = req.header('Authorization');
   const cookies = req.cookies;
-  //aqui me rechaza por la cookie
+  //si no tiene el header de aut y tampoco el toke de cookies
   if (!auth && !cookies.token) {
     return res.status(403).json({
       status: 'No-Auth',
@@ -38,6 +39,7 @@ const verifyToken = (req, res, next) => {
   }
 
   if (cookies.token) {
+    //si eciste la cookie en la funcion continua con validar el rol
     handleToken(cookies.token, req, res, next);
   } else {
     //obtengo el token de la cabecera
