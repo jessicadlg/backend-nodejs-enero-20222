@@ -1,0 +1,14 @@
+const {mongoose} = require('../config/db')
+
+const {Schema} = mongoose
+//el esquema permite definir una estructura de nuestro objeto atributo y tipo.
+
+const movieSchema = new Schema({
+  title:String,
+  date:Date,
+  rating:Number
+})
+
+const MovieModel = mongoose.model("movies",movieSchema)
+
+module.exports = MovieModel

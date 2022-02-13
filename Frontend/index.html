@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css"
+        integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+        integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>Login</title>
+</head>
+
+<body class="bg-ligth">
+    <p id="status"></p>
+    <div class="container  mt-5">
+        <div class="card-header bg-white card shadow-lg">
+
+        <div class="row justify-content-center">
+            <div class="col-xl-10 col-lg-12 col-md-9">
+                <h1 class="titulo text-center">Login</h1>
+            </div>
+        </div>
+            <form id="form">
+            
+                <div class="form-group mx-2">
+                    <input type="email" name="email" id="email" class="form-control" placeholder="Usuario:" />
+                </div>
+                <div class="form-group mx-2">
+                    <input type="password" name="password" id="password" class="form-control"
+                        placeholder="Contraseña:" />
+                </div>
+
+                    <div class="form-group m-2">
+                        <input type="submit" value="Iniciar sesión" class="btn btn-block btn-info ">
+                    </div>
+                    <p class="text-center">Aun no estas registrado?   <a href="./signup.html">Ir  a registro</a></p>
+                  
+            </form>
+        </div>
+            <button id="fetchUser">Consultar usuarios</button>
+            <button id="logout">Cerrar sesión</button>
+            <button id="logoutCookie">Cerrar sesión cookie</button>
+          
+            <!-- Footer-->
+            <!--<footer class="container-fluid p-1 bg-dark fixed-bottom mt-5 text-center">
+                                    <a href="#" class="btn btn-block btn-info ">Iniciar sesion</a>
+
+                <div class="row mx-auto">
+
+                    <div class="col-xs-12 mt-3 mx-auto">
+                        <a class="btn btn-dark btn-social mx-2" href="#!"><i class="fab fa-twitter"></i></a>
+                        <a class="btn btn-dark btn-social mx-2" href="#!"><i class="fab fa-facebook-f"></i></a>
+                        <a class="btn btn-dark btn-social mx-2" href="#!"><i class="fab fa-linkedin-in"></i></a>
+
+                        <p class="text-light my-2 text-center">Copyright &copy; Nuestra Website 2022</p>
+                        <p><a class="text-light text-decoration-none me-3" href="#!">Políticas de privacidad</a></p>
+                        <p><a class="text-light text-decoration-none me-3" href="#!">Términos de uso</a></p>
+                    </div>
+                </div>
+        </div>
+        </footer>-->
+            <script>
+                const form = document.getElementById("form")
+                const statusElement = document.getElementById("status")
+                const fetchUser = document.getElementById("fetchUser")
+                const logoutButton = document.getElementById("logout")
+                const logoutButtonCookie = document.getElementById("logoutCookie")
+                function iniciarSesion() {
+                    fetch("http://localhost:4002/auth/login", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            email: form.email.value,
+                            password: form.password.value
+                        }),
+                        credentials: 'include'
+                    }).then(res => {
+                        return res.json()
+                    }).then(data => {
+                        localStorage.setItem("token", data.token)
+                        statusElement.innerText = "Sesión iniciada"
+                        window.location.href='http://127.0.0.1:5500/Frontend/home.html'
+                    })
+                }
+
+
+
+                if (localStorage.getItem("token")) {
+                    statusElement.innerText = "Sesión iniciada"
+                } else {
+                    statusElement.innerText = "Sin permisos"
+                }
+
+                form.onsubmit = (event) => {
+                    event.preventDefault()
+                    iniciarSesion()
+                }
+
+
+                fetchUser.onclick = () => {
+                    fetch("http://localhost:4002/users", {
+                        // headers:{
+                        //     "Authorization":"Bearer "+localStorage.getItem("token")
+                        // },
+                        credentials: 'include'
+                    })
+                        .then(res => res.json())
+                        .then(data => console.log(data))
+                }
+
+                logoutButton.onclick = () => {
+                    localStorage.removeItem("token")
+                    statusElement.innerText = "Sin permisos"
+                }
+
+                logoutButtonCookie.onclick = () => {
+                    fetch("http://localhost:4002/auth/logout", {
+                        // headers:{
+                        //     "Authorization":"Bearer "+localStorage.getItem("token")
+                        // },
+                        method: "POST",
+                        //para que incluya mandar credenciales por cookies
+                        credentials: 'include'
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            console.log(data)
+                            statusElement.innerText = "Sin permisos"
+                        })
+                }        
+            </script>
+            <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
+                integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+                crossorigin="anonymous"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"
+                integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF"
+                crossorigin="anonymous"></script>
+</body>
+
+</html>

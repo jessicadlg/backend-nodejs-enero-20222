@@ -1,0 +1,87 @@
+</html>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css"
+        integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+        integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>Formulario de registro</title>
+</head>
+
+<body class="bg-primary">
+
+    <p id="status"></p>
+    <div class="container  mt-5">
+        <div class="card-header bg-white card shadow-lg">
+            <div class="row  mb-5 justify-content-center">
+                <div class="col-xl-10 col-lg-12 col-md-9">
+                    <h3 class="titulo text-center">Bienvenido</h3>
+                </div>
+            </div>
+            <section class="d-flex justify-content-center">
+                <div class="form-group m-2">
+                    <input type="submit" id="fetchUser" value="Consultar usuarios" class="btn btn-block btn-success ">
+                </div>
+                <!-- <button >Consultar usuarios</button> -->
+                <div class="form-group m-2">
+                    <input type="submit" id="logout" value="Cerrar sesión" class="btn btn-block btn-danger">
+                </div>
+                <div class="form-group m-2">
+                    <input type="submit" id="logoutCookie" value="Cerrar sesión cookie" class="btn btn-block btn-primary">
+                </div>                
+            </section>
+        </div>
+        <script>
+            const fetchUser = document.getElementById("fetchUser")
+
+            const logoutButton = document.getElementById("logout")
+
+            const logoutButtonCookie = document.getElementById("logoutCookie")
+
+            fetchUser.onclick = () => {
+                fetch("http://localhost:4000/users", {
+                    // headers:{
+                    //     "Authorization":"Bearer "+localStorage.getItem("token")
+                    // },
+                    credentials: 'include'
+                })
+                    .then(res => res.json())
+                    .then(data => console.log(data))
+            }
+
+            logoutButton.onclick = () => {
+                localStorage.removeItem("token")
+                statusElement.innerText = "Sin permisos"
+            }
+
+            logoutButtonCookie.onclick = () => {
+                fetch("http://localhost:4000/auth/logout", {
+                    // headers:{
+                    //     "Authorization":"Bearer "+localStorage.getItem("token")
+                    // },
+                    method: "POST",
+                    credentials: 'include'
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        console.log(data)
+                        statusElement.innerText = "Sin permisos"
+                    })
+            }
+
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
+            integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+            crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF"
+            crossorigin="anonymous"></script>
+</body>
+
+</html>
