@@ -15,12 +15,11 @@ const handleToken = (token, req, res, next) => {
     });
   }
 };
-
+//middleware para chequear el rol, o si no pertenece mandar msj
 const validateRole = (req, res, next) => {
   if (req.user.role >= req.neededRole) {
     return next();
   }
-
   return res.status(403).json({
     status: 'Insuficient permissions',
     message: 'A superior role is required for this action',
@@ -49,16 +48,16 @@ const verifyToken = (req, res, next) => {
 };
 
 const isRegular = (req, res, next) => {
-  req.neededRole = 0;
+  req.neededRole = 1;
   verifyToken(req, res, next);
 };
 
 const isEditor = (req, res, next) => {
-  req.neededRole = 1;
+  req.neededRole = 2;
   verifyToken(req, res, next);
 };
 const isAdmin = (req, res, next) => {
-  req.neededRole = 2;
+  req.neededRole = 3;
   verifyToken(req, res, next);
 };
 

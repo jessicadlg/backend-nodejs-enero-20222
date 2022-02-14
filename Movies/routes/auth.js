@@ -7,6 +7,7 @@ function auth(app) {
   app.use('/auth', router);
 
   router.post('/login', async (req, res) => {
+    //desestructuro lo necesario del obj
     const { email, password } = req.body;
     const response = await authService.login(email, password);
     //LE PUEDO ENVIAR EN LA COOKIE EL TOKEN

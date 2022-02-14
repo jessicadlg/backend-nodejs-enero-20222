@@ -15,6 +15,7 @@ const prueba = require('./routes/index');
 const movies = require('./routes/movies');
 const users = require('./routes/users');
 const auth = require('./routes/auth');
+const reviews = require('./routes/reviews');
 
 const app = express();
 
@@ -44,6 +45,7 @@ prueba(app);
 movies(app);
 users(app);
 auth(app);
+reviews(app);
 
 app.get('/', (req, res) => {
   return res.status(200).send('Hola, bienvenido');
