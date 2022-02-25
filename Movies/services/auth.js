@@ -11,30 +11,35 @@ class Auth {
   async hashPassword(password) {
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
-
     return hash;
   }
 
-  // Implementado  metodo  decrypting linea 22
+  getToken(user) {
+    const data = {
+      id: user.id,
+      displayName: user.displayName,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      role: user.role ? user.role : 0,
+    };
+    const token = jwt.sign(data, jwt_secret, { expiresIn: '1d' });
+    return { success: true, data, token };
+  }
 
+  // Implementado  metodo  decrypting linea 35
   async login(email, password) {
     const user = await this.users.getByEmail(email);
-    const correctPassword = await bcrypt.compare(password, user.password);
-    console.log(correctPassword);
-    if (user && correctPassword) {
-      // user.password = undefined
-      // user.__v = undefined
-      // jwt.sign(user,jwt_secret,{expiresIn:"1d"},(error,token)=>{
-      //     return {success:true,user,token}
-      // })
-      const data = {
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        role: user.role ? user.role : 0,
-      };
-      const token = jwt.sign(data, jwt_secret /*{ expiresIn: '1d' }*/);
-      return { success: true, data, token };
+    if (user) {
+      const correctPassword = await bcrypt.compare(password, user.password);
+      if (correctPassword) {
+        // user.password = undefined
+        // user.__v = undefined
+        // jwt.sign(user,jwt_secret,{expiresIn:"1d"},(error,token)=>{
+        //     return {success:true,user,token}
+        // })
+        return this.getToken(user);
+      }
     }
 
     return { success: false, message: 'Las credenciales no coinciden' };
@@ -44,17 +49,27 @@ class Auth {
     if (await this.users.getByEmail(userData.email)) {
       return { succes: false, message: 'Usuario ya registrado' };
     } else {
+      userData.role = 0;
       userData.password = await this.hashPassword(userData.password);
       const user = await this.users.create(userData);
-      const data = {
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        role: user.role ? user.role : 0,
-      };
-      const token = jwt.sign(data, jwt_secret /*{ expiresIn: '1d' }*/);
-      return { succes: true, data, token };
+      return this.getToken(user);
     }
+  }
+  //verifica si no existe el usuario
+  async loginProvider(profile) {
+    let user = await this.users.getByFilter({ idProvider: profile.id });
+    if (!user) {
+      user = await this.users.create({
+        firstName: profile.name?.givenName,
+        lastName: profile.name?.familyName,
+        displayName: profile.displayName,
+        email: profile.emails ? profile.emails[0].value : undefined,
+        role: 0,
+        provider: profile.provider,
+        idProvider: profile.id,
+      });
+    }
+    return this.getToken(user);
   }
 }
 

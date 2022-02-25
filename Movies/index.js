@@ -1,10 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const cookies = require('cookie-parser');
-// const passport = require('passport');
-const config = require('./config');
-//importar LA ESTRATEGIA que utilizo de la nube
-// const GoogleStrategy = require('passport-google-oauth20').Strategy;
+//const session = require('express-session');
+
+const { port /*session_secret*/ } = require('./config');
 
 //Trayendo conexión a BD
 const { connection } = require('./config/db');
@@ -15,7 +14,7 @@ const prueba = require('./routes/index');
 const movies = require('./routes/movies');
 const users = require('./routes/users');
 const auth = require('./routes/auth');
-const reviews = require('./routes/reviews');
+//const reviews = require('./routes/reviews');
 
 const app = express();
 
@@ -28,29 +27,27 @@ app.use(
     credentials: true,
   })
 );
-app.use(cookies());
-//INICIALIZO EL MIDDLEWARE DE PASSPORT
-// app.use(passport.initialize());
-
-// passport.use(
-//   new GoogleStrategy({
-//     clientID: config.oauth_client_id,
-//     clientSecret: config.oauth_client_secret,
-//     callbackURL: config.oauth_callback_url,
+//esto es para el login con twiter
+// app.use(
+//   session({
+//     secret: session_secret,
+//     resave: false,
+//     saveUninitialized: true,
 //   })
 // );
+app.use(cookies());
 
 // Utilizando las rutas
 prueba(app);
 movies(app);
 users(app);
 auth(app);
-reviews(app);
+//reviews(app);
 
 app.get('/', (req, res) => {
-  return res.status(200).send('Hola, bienvenido');
+  return res.status(200).send('Home');
 });
 
-app.listen(config.port, () => {
-  console.log('Servidor: http://localhost:' + config.port);
+app.listen(port, () => {
+  console.log('Servidor: http://localhost:' + port);
 });

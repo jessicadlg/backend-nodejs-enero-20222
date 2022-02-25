@@ -1,5 +1,16 @@
 const MovieModel = require('../models/movie');
 class Movies {
+  validate(movie) {
+    const error = movie.validateSync();
+    if (error) {
+      const errorMessages = Object.keys(error.errors).map(
+        (e) => error.errors[e].message
+      );
+      return { error: true, errorMessages };
+    }
+    return { error: false };
+  }
+
   async get(id) {
     const movie = await MovieModel.findById(id);
     return movie;
@@ -12,8 +23,26 @@ class Movies {
   }
 
   async create(data) {
-    const movie = await MovieModel.create(data);
-    return movie;
+    //traemos la data
+    const movie = new MovieModel(data);
+    const validation = this.validate(movie);
+
+    if (validation.error) {
+      return { created: false, errors: validation.errorMessages };
+    }
+
+    return await movie.save();
+
+    // movie.validate((error)=>{
+    //     console.log(error)
+    // })
+
+    // try{
+    //     const movie = await MovieModel.create(data)
+    //     return movie
+    // }catch(error){
+    //     return {created:false,message:`Hubo un error`}
+    // }
   }
 
   async update(id, data) {
