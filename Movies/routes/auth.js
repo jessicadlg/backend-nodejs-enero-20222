@@ -1,6 +1,4 @@
 const express = require('express');
-const Auth = require('../services/auth');
-//importar LA ESTRATEGIA que utilizo de la nube
 const {
   useGoogleStrategy,
   useFacebookStrategy,
@@ -8,6 +6,9 @@ const {
   isRegular,
 } = require('../middleware/auth');
 const passport = require('passport');
+
+const Auth = require('../services/auth');
+const tokenToCookie = require('../helper/tokenToCookie');
 
 function auth(app) {
   const router = express.Router();
@@ -29,24 +30,12 @@ function auth(app) {
     const { email, password } = req.body;
     const response = await authService.login(email, password);
     //LE PUEDO ENVIAR EN LA COOKIE EL TOKEN
-    return res
-      .cookie('token', response.token, {
-        httpOnly: true,
-        sameSite: 'none',
-        secure: true,
-      })
-      .json(response.data);
+    return tokenToCookie(res, response);
   });
   router.post('/signup', async (req, res) => {
     const user = req.body;
     const response = await authService.signup(user);
-    return res
-      .cookie('token', response.token, {
-        httpOnly: true,
-        sameSite: 'none',
-        secure: true,
-      })
-      .json(response.data);
+    return tokenToCookie(res, response);
   });
   router.post('/logout', (req, res) => {
     return res
@@ -72,13 +61,7 @@ function auth(app) {
     passport.authenticate('google'),
     async (req, res) => {
       const response = await authService.loginProvider(req.user.profile);
-      return res
-        .cookie('token', response.token, {
-          httpOnly: true,
-          sameSite: 'none',
-          secure: true,
-        })
-        .redirect('http://127.0.0.1:5500/Frontend/index.html');
+      return tokenToCookie(res, response);
     }
   );
   router.get('/facebook', passport.authenticate('facebook'));
@@ -88,15 +71,7 @@ function auth(app) {
     async (req, res) => {
       console.log(req.user.profile);
       const response = await authService.loginProvider(req.user.profile);
-      return res
-        .cookie('token', response.token, {
-          httpOnly: true,
-          sameSite: 'none',
-          secure: true,
-        })
-        .json(response);
-
-      return res.json({ message: 'Bienvenido' });
+      return tokenToCookie(res, response);
     }
   );
   // router.get('/github', passport.authenticate('github'));

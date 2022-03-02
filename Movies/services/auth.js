@@ -2,6 +2,7 @@ const Users = require('./users');
 const jwt = require('jsonwebtoken');
 const { jwt_secret } = require('../config');
 const bcrypt = require('bcrypt');
+const sendEmail = require('../libs/email');
 
 class Auth {
   constructor() {
@@ -23,12 +24,15 @@ class Auth {
       email: user.email,
       role: user.role ? user.role : 0,
     };
-    const token = jwt.sign(data, jwt_secret, { expiresIn: '1d' });
+    const token = jwt.sign(data, jwt_secret, { expiresIn: '7d' });
     return { success: true, data, token };
   }
 
   // Implementado  metodo  decrypting linea 35
   async login(email, password) {
+    if (!email || !password) {
+      return { success: false, message: 'Ingresa credenciales' };
+    }
     const user = await this.users.getByEmail(email);
     if (user) {
       const correctPassword = await bcrypt.compare(password, user.password);
@@ -52,6 +56,12 @@ class Auth {
       userData.role = 0;
       userData.password = await this.hashPassword(userData.password);
       const user = await this.users.create(userData);
+      await sendEmail(
+        userData.email,
+        'Registro exitoso',
+        'Bienvenido a la aplicación',
+        '<h1><em>Bienvenido</em> a la aplicación</h1>'
+      );
       return this.getToken(user);
     }
   }

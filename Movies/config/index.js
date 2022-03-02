@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const config = {
-  mode: process.env.MODE,
+  env: process.env.NODE_ENV,
   jwt_secret: process.env.JWT_SECRET,
   port: process.env.PORT,
   session_secret: process.env.SESSION_SECRET,
@@ -9,6 +9,10 @@ const config = {
   db_username: process.env.DB_USERNAME,
   db_host: process.env.DB_HOST,
   db_name: process.env.DB_NAME,
+  callback_url:
+    process.env.NODE_ENV === 'dev'
+      ? process.env.CALLBACK_URL_DEVELOPMENT
+      : process.env.CALLBACK_URL,
   oauth_client_id: process.env.OAUTH_CLIENT_ID,
   oauth_client_secret: process.env.OAUTH_CLIENT_SECRET,
   oauth_callback_url: process.env.OAUTH_CALLBACK_URL,
@@ -18,6 +22,12 @@ const config = {
   github_client_secret: process.env.GITHUB_CLIENT_SECRET,
   twitter_consumer_id: process.env.TWITTER_CONSUMER_ID,
   twitter_consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
+  email_host: process.env.EMAIL_HOST,
+  email_port: process.env.EMAIL_PORT,
+  email_secure: process.env.EMAIL_SECURE,
+  email_user: process.env.EMAIL_USER,
+  email_password: process.env.EMAIL_PASSWORD,
 };
 
+console.log(config.callback_url);
 module.exports = config;
